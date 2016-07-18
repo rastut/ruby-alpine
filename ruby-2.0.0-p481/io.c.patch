@@ -1,0 +1,32 @@
+--- io.c
++++ /usr/src/ruby/io.c
+@@ -8496,6 +8496,7 @@
+ # define NUM2IOCTLREQ(num) NUM2INT(num)
+ #endif
+ 
++#ifdef HAVE_IOCTL
+ struct ioctl_arg {
+     int		fd;
+     ioctl_req_t	cmd;
+@@ -8524,10 +8525,11 @@
+ 
+     return retval;
+ }
++#endif
+ 
+ #define DEFULT_IOCTL_NARG_LEN (256)
+ 
+-#ifdef __linux__
++#if defined(__linux__) && defined(_IOC_SIZE)
+ static long
+ linux_iocparm_len(ioctl_req_t cmd)
+ {
+@@ -8560,7 +8562,7 @@
+ #endif
+ #ifdef IOCPARM_LEN
+     len = IOCPARM_LEN(cmd);	/* on BSDish systems we're safe */
+-#elif defined(__linux__)
++#elif defined(__linux__) && defined(_IOC_SIZE)
+     len = linux_iocparm_len(cmd);
+ #else
+     /* otherwise guess at what's safe */
